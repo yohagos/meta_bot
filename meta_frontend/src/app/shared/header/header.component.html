@@ -1,0 +1,49 @@
+<mat-toolbar>
+  <button mat-icon-button (click)="drawer.toggle()" class="left-section" *ngIf="authenticated">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <div class="status middle-section">
+    <strong>Meta</strong>
+  </div>
+
+  <button (click)="toggle()" mat-icon-button class="right-section">
+    <mat-icon>
+      {{themeIcon}}
+    </mat-icon>
+  </button>
+
+  @if (!authenticated) {
+    <button mat-raised-button *ngIf="!authenticated" class="right-section" (click)="login()">
+      Log In
+    </button>
+  } @else {
+    <button mat-raised-button *ngIf="authenticated" class="right-section" (click)="logout()">
+      Log Out
+    </button>
+  }
+</mat-toolbar>
+<mat-divider></mat-divider>
+<mat-drawer-container class="drawer-container" autosize>
+  <mat-drawer class="sidenav" #drawer mode="over">
+    <mat-nav-list >
+      @for (item of drawerMenu; track $index) {
+        <a mat-list-item
+        routerLink="/{{item.uri}}"
+        routerLinkActive="active-menu-item"
+        [routerLinkActiveOptions]="{exact: true}"
+        class="menu-items"
+        matTooltip="{{item.info}}"
+        [matTooltipShowDelay]="tooltipDelay"
+        [matTooltipHideDelay]="tooltipDelay"
+        [matTooltipPosition]="'right'"
+        (click)="navigateTo(item)">
+          {{item.name}}
+        </a>
+      }
+    </mat-nav-list>
+  </mat-drawer>
+  <mat-drawer-content class="container">
+    <router-outlet></router-outlet>
+  </mat-drawer-content>
+</mat-drawer-container>
+

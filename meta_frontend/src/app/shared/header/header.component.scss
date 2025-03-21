@@ -1,0 +1,39 @@
+@use 'sass:map';
+@use 'theme-colors' as tc;
+
+.drawer-container {
+  width: 100%;
+  height: 93vh;
+}
+
+.sidenav {
+  padding: 20px;
+}
+
+.sections {
+  display: flex;
+}
+.left-section {
+  flex: 0.3;
+}
+
+.middle-section {
+  flex: 8;
+}
+
+.right-section {
+  flex: 0.4;
+}
+
+.mat-mdc-list-item {
+  --mdc-list-list-item-label-text-size: 1rem;
+  transition: background-color 0.3s ease;
+
+  margin: 1.2em 0;
+
+  &.active-menu-item {
+    border-left: 8px solid #3f51b5;
+    --mdc-list-list-item-label-text-size: 1.13rem;
+    transition: --mdc-list-list-item-label-text-size 0.2s ease;
+  }
+}
