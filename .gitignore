@@ -175,6 +175,7 @@ cython_debug/
 
 meta_frontend/.vscode
 meta_frontend/node_modules
+meta_frontend/src/app/services
 
 pg_data
 kc_data
