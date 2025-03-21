@@ -175,3 +175,9 @@ cython_debug/
 
 meta_frontend/.vscode
 meta_frontend/node_modules
+
+pg_data
+kc_data
+mq_data
+.idea
+.vscode
