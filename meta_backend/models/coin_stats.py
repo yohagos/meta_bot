@@ -22,4 +22,4 @@ class Stats(CoinStats, table=True):
     __table_args__ = {'extend_existing': True}
     
     id: Optional[UUID] = Field(default_factory=uuid4, primary_key=True, index=True)
-    timestamp: datetime
+    timestamp: datetime 
