@@ -181,3 +181,5 @@ kc_data
 mq_data
 .idea
 .vscode
+
+meta_backend/migrations/versions
