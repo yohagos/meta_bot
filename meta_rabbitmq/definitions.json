@@ -1,0 +1,55 @@
+{
+  "vhosts": [
+    {
+      "name": "/meta"
+    }
+  ],
+  "users": [
+    {
+      "name": "mquser",
+      "password": "mquser",
+      "tags": "administrator"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "mquser",
+      "vhost": "/meta",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "crypto_data_exchange",
+      "vhost": "/meta",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "coin_updates_queue",
+      "vhost": "/meta",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-max-length": 10000,
+        "x-message-ttl": 300000
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "crypto_data_exchange",
+      "vhost": "/meta",
+      "destination": "coin_updates_queue",
+      "destination_type": "queue",
+      "routing_key": "coin.update",
+      "arguments": {}
+    }
+  ]
+}
