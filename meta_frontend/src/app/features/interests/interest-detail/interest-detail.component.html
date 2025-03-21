@@ -1,0 +1,132 @@
+@if (loading) {
+  <mat-spinner class="spinner"></mat-spinner>
+} @else {
+  <div class="back-button">
+    <a mat-fab extended [routerLink]="['/interests']" >
+      <mat-icon>arrow_back</mat-icon>
+      Overview
+    </a>
+  </div>
+  <div class="card-container" *ngIf="interest$ | async as interest">
+      <mat-card *ngIf="interest.stats as stats">
+        <mat-card-title class="card-title">
+          {{interest.stats.name}}
+          <span mat-card-subtitle> {{interest.stats.symbol}} </span>
+        </mat-card-title>
+        <mat-card-content>
+          <div class="filter">
+            <mat-form-field class="currency-filter" >
+              <mat-label>Choose a currency</mat-label>
+              <mat-select [(ngModel)]="currency" [disabled]="loading" >
+                <mat-option *ngFor="let item of currencies" [value]="item">{{item}} </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button mat-button class="cancel-icon" *ngIf="currency && currency.length > 0" (click)="clearFilter()">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+          <div class="detail-container">
+            <div class="detail-row">
+              <div class="detail-attribute">Name</div>
+              <div class="detail-value"> {{stats.name}} </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-attribute">Symbol</div>
+              <div class="detail-value"> {{stats.symbol}} </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-attribute">Rank</div>
+              <div class="detail-value">{{stats.rank}}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-attribute">Timestamp</div>
+              <div class="detail-value"> {{stats.timestamp | date: 'HH:mm dd.MM.yyyy' }} </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-attribute">Change Percent in 24 Hours</div>
+              <div class="detail-value"> {{ stats.changePercent24Hr  | number:'1.0-3' }} % </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('USD')">
+              <div class="detail-attribute">Supply USD</div>
+              <div class="detail-value"> {{stats.supply  | currency:'USD':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('EUR')">
+              <div class="detail-attribute">Supply EUR</div>
+              <div class="detail-value"> {{stats.supply  | currency:'USD':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('USD')">
+              <div class="detail-attribute">Max. Supply USD</div>
+              <div class="detail-value"> {{stats.maxSupply  | currency:'USD':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('EUR')">
+              <div class="detail-attribute">Max. Supply EUR</div>
+              <div class="detail-value"> {{stats.maxSupply  | currency:'USD':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('USD')">
+              <div class="detail-attribute">Market Cap in USD</div>
+              <div class="detail-value"> {{stats.marketCapUsd| currency:'USD':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('EUR')">
+              <div class="detail-attribute">Market Cap in EUR</div>
+              <div class="detail-value"> {{stats.marketCapUsd  | currency:'EUR':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('USD')">
+              <div class="detail-attribute">Price in USD</div>
+              <div class="detail-value"> {{stats.priceUsd  | currency:'USD':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('EUR')">
+              <div class="detail-attribute">Price in EUR</div>
+              <div class="detail-value"> {{stats.priceUsd  | currency:'EUR':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('USD')">
+              <div class="detail-attribute">Volume USD in 24 Hours</div>
+              <div class="detail-value"> {{stats.volumeUsd24Hr  | currency:'USD':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('EUR')">
+              <div class="detail-attribute">Volume EUR in 24 Hours</div>
+              <div class="detail-value"> {{stats.volumeUsd24Hr  | currency:'EUR':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('USD')">
+              <div class="detail-attribute">VWAP USD in 24 Hours</div>
+              <div class="detail-value"> {{stats.vwap24Hr| currency:'USD':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row" *ngIf="currencyFilter('EUR')">
+              <div class="detail-attribute">VWAP EUR in 24 Hours</div>
+              <div class="detail-value"> {{stats.vwap24Hr| currency:'EUR':'symbol':'1.2-2' }} </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-attribute">Explorer</div>
+              <div class="detail-value"> <a href="{{stats.explorer}}" class="explorer-link"> Link </a> </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card *ngIf="interest.coin as coin">
+        <mat-card-title>
+          {{interest.coin.coin_name}}
+        </mat-card-title>
+        <mat-card-content>
+          <div class="detail-container">
+            <div class="detail-row">
+              <div class="detail-attribute">Name</div>
+              <div class="detail-value"> {{coin.coin_name}} </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-attribute">Symbol</div>
+              <div class="detail-value"> {{coin.coin_symbol}} </div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-attribute">Description</div>
+              <div class="detail-value">{{coin.description}}</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-attribute">Explorer</div>
+              <div class="detail-value"> <a href="{{coin.website}}" class="explorer-link"> Link </a> </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+  </div>
+}

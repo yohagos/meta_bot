@@ -1,0 +1,31 @@
+@if (loading) {
+  <mat-spinner class="spinner"></mat-spinner>
+} @else {
+  <mat-form-field class="filter">
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" #input>
+    <button
+      mat-icon-button
+      matSuffix
+      [attr.aria-label]="'Clear Filter'"
+      *ngIf="input.value"
+      (click)="clearFilter(input)">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <div class="card-container" *ngIf="filteredInterests$ | async as interests">
+    <div class="card-grid">
+      <mat-card class="card" *ngFor="let item of interests" (click)="detailView(item)">
+        <div class="card-content" *ngIf="item.coin">
+          <h3 class="card-title">{{item.coin.coin_name}}</h3>
+          <p>{{item.coin.coin_symbol}}</p>
+        </div>
+        <div class="card-content" *ngIf="item.stats">
+          <h3>{{item.stats.symbol}}</h3>
+          <p>{{item.stats.name}}</p>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+}

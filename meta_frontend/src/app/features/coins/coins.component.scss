@@ -1,0 +1,106 @@
+table {
+  width: 100%;
+}
+
+.mat-mdc-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+tr.detail-row {
+  height: 0;
+}
+
+tr.element-row {
+  cursor: pointer;
+}
+
+tr.element-row:not(.expanded-row):hover {
+  _background: whitesmoke;
+  _cursor: pointer;
+}
+
+tr.element-row:not(.expanded-row):active {
+  _background: #8b1111;
+}
+
+.element-row td {
+  border-bottom-width: 0;
+}
+
+.element-diagram {
+  min-width: 80px;
+
+  max-height: 10em;
+}
+
+.element-detail-wrapper {
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 0fr;
+  grid-template-columns: 100%;
+  transition: grid-template-rows 225ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+.element-detail-wrapper {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &-expanded {
+    max-height: 300px;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+.mat-sort-header-container {
+  justify-content: center;
+}
+
+.element-detail {
+  display: flex;
+  min-height: 0;
+}
+
+.element-description {
+  display: flex;
+  margin: 0.3em;
+}
+
+.element-website {
+  display: flex;
+  margin: 0.3em;
+}
+
+.element-created-date {
+  display: flex;
+  margin: 0.3em;
+}
+
+.toggle-button {
+  transition: transform 225ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-button-expanded {
+  transform: rotate(180deg);
+}
+
+
+
+.detail-wrapper {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 225ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.detail-wrapper.expanded {
+  max-height: 300px; // Passe diesen Wert an, damit er deinen Inhalt vollständig anzeigt
+}
+
+.detail {
+  padding: 16px;
+  _background-color: #f8f8f8;
+}
+
+

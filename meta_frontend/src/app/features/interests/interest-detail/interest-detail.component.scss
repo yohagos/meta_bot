@@ -1,0 +1,93 @@
+@use 'sass:map';
+@use './../../../../styles.scss';
+@use './../../../../styles/theme-colors.scss';
+
+.card-container {
+  max-width: 90%;
+  min-width: 50%;
+  width: 80%;
+  height: auto;
+  margin: auto;
+}
+
+.back-button {
+  width: 79%;
+  margin: auto ;
+}
+
+.spinner {
+  z-index: 100;
+  margin: 30% auto;
+}
+
+.card-title {
+  margin: 1em;
+
+  &.mat-mdc-card-title {
+    font-weight: bold;
+  }
+}
+
+.mat-mdc-card{
+  margin: 1em;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .currency-filter {
+    flex: 9;
+  }
+  .cancel-icon {
+    flex: 1;
+
+    &.mat-mdc-button {
+      padding: 0;
+    }
+  }
+
+  margin-bottom: 1.2em;
+
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 6px 8px;
+}
+
+.detail-attribute {
+  flex: 1;
+
+  color: palegreen;
+  text-align: left;
+}
+
+.detail-value {
+  flex: 1;
+  text-align: right;
+}
+
+.explorer-link {
+  color: white;
+  text-decoration: none;
+
+  &:hover {
+    color: palegreen;
+    transition: color 0.6s ease-in-out;
+  }
+}

@@ -1,0 +1,75 @@
+<mat-form-field>
+  <mat-label>Filter</mat-label>
+  <input matInput (keyup)="applyFilter($event)" #input>
+</mat-form-field>
+
+<table
+  mat-table
+  [dataSource]="dataSource"
+  multiTemplateDataRows
+  matSort
+  class="mat-elevation-z8">
+
+  <ng-container matColumnDef="coin_name">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Coin Name </th>
+    <td mat-cell *matCellDef="let element"> {{ element.coin_name }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="coin_symbol">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> Symbol </th>
+    <td mat-cell *matCellDef="let element"> {{ element.coin_symbol }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="expand">
+    <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+    <td mat-cell *matCellDef="let element">
+      <button mat-icon-button
+        aria-label="expand row"
+        (click)="toggle(element); $event.stopPropagation()"
+        class="toggle-button"
+        [class.toggle-button-expanded]="isExpanded(element)">
+        <mat-icon>
+          keyboard_arrow_down
+        </mat-icon>
+      </button>
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="expandedDetail">
+    <td
+        mat-cell
+        *matCellDef="let element"
+        [attr.colspan]="displayedColumnsWithExpand.length">
+      <div
+        class="detail-wrapper"
+        [ngClass]="{'expanded': isExpanded(element)}">
+        <div class="detail" >
+          <div class="element-diagram">
+            <div class="element-description" *ngIf="element.description">{{element.description}} <p>test</p></div>
+            <div class="element-website" *ngIf="element.website">{{element.website}} <p>test</p></div>
+            <div class="element-created-date">{{element.created_date | date: 'HH:mm:ss dd.MM.yyyy'}}</div>
+          </div>
+        </div>
+      </div>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumnsWithExpand"></tr>
+  <tr
+    mat-row
+    *matRowDef="let element; columns: displayedColumnsWithExpand"
+
+    (click)="toggle(element)">
+  </tr>
+  <tr mat-row
+      *matRowDef="let row; columns: ['expandedDetail']"
+      class="detail-row">
+    </tr>
+
+  <tr class="mat-row" *matNoDataRow>
+    <td class="mat-cell" colspan="4"> No data matching the filter "{{input.value}}" </td>
+  </tr>
+
+  <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" aria-label="Select page of Coins"></mat-paginator>
+</table>
+
