@@ -1,0 +1,96 @@
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use 'theme-colors' as tc;
+@include mat.core();
+
+@import url("https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp");
+
+
+html {
+  height: 100% ;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--surface-container-low);
+}
+
+.mat-icon {
+  margin: 0 !important;
+}
+
+.container {
+  margin: 1em;
+}
+
+:root {
+  @include mat.sidenav-overrides((
+    container-divider-color: map.get(tc.$primary, 80),
+    container-elevation-shadow: map.get(tc.$tertiary, 40),
+  ));
+
+  @include mat.icon-overrides((
+    color: map.get(tc.$primary, 70),
+  ));
+
+  @include mat.list-overrides((
+    //list-item-hover-label-text-color: map.get(tc.$primary, 60),
+  ));
+
+  @include mat.snack-bar-overrides((
+    container-color: var(--surface-container-low),
+  ));
+
+  @include mat.card-overrides((
+    subtitle-text-color: map.get(tc.$primary, 80),
+  ));
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-corner {
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2pt solid transparent;
+  border-radius: 3pt;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, .2);
+  border: 3pt solid transparent;
+  background-clip: content-box;
+}
+
+.custom-scroll-vertical-hover::-webkit-scrollbar-thumb:vertical {
+  background: rgba(255, 255, 255, .4);
+  border: none;
+  border-radius: 0;
+}
+
+.custom-scroll-vertical-hover::-webkit-scrollbar-track:vertical {
+  background: rgba(255, 255, 255, .2);
+  border: none;
+}
+
+::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+::-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
