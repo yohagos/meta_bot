@@ -2,11 +2,13 @@ import { inject, Injectable } from '@angular/core';
 import { CoinsService } from '../../../services/services';
 import { BehaviorSubject } from 'rxjs';
 import { CoinRead } from '../../../services/models';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CoinBehaviorService {
+  private _snackbarService = inject(SnackbarService)
   private _coinService = inject(CoinsService)
 
   private _coinBehavior = new BehaviorSubject<CoinRead[]>([])
@@ -23,8 +25,8 @@ export class CoinBehaviorService {
       next: (data: CoinRead[]) => {
         this._coinBehavior.next(data)
       },
-      error: (err) => {
-        console.error(err)
+      error: (err: Error) => {
+        this._snackbarService.openSnackBar(`${err.message}`, 'error')
       }
     })
   }

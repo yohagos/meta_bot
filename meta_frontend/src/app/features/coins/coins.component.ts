@@ -12,6 +12,7 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { CoinBehaviorService } from './services/coin-behavior.service';
 import { catchError, finalize, of, Subject, takeUntil } from 'rxjs';
+import { SnackbarService } from '../../shared/services/snackbar.service';
 
 
 @Component({
@@ -26,12 +27,12 @@ import { catchError, finalize, of, Subject, takeUntil } from 'rxjs';
     MatPaginatorModule,
     MatSortModule,
     MatTableModule,
-
   ],
   templateUrl: './coins.component.html',
   styleUrl: './coins.component.scss',
 })
 export class CoinsComponent implements AfterViewInit, OnDestroy {
+  private _snackbarService = inject(SnackbarService)
   private _coinBehaviorService = inject(CoinBehaviorService)
   coins$ = this._coinBehaviorService.getCoins()
 
@@ -53,7 +54,7 @@ export class CoinsComponent implements AfterViewInit, OnDestroy {
       .pipe(
         takeUntil(this.destroy$),
         catchError(err => {
-          console.error("Error loading coins: ", err)
+          this._snackbarService.openSnackBar('Error loading coins', 'error')
           return of([])
         }),
         finalize(() => this.isLoading.set(false))
@@ -83,7 +84,6 @@ export class CoinsComponent implements AfterViewInit, OnDestroy {
   }
 
   toggle(element: CoinRead) {
-    console.log('toggle clicked')
     this.expandedElementId = this.isExpanded(element) ? null : element.id
   }
 

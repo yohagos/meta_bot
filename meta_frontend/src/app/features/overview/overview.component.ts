@@ -23,6 +23,6 @@ export class OverviewComponent {
   }
 
   openinterest() {
-    this._router.navigate(['interests'])
+    this._router.navigate(['histories'])
   }
 }
