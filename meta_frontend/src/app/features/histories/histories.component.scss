@@ -1,0 +1,115 @@
+@use 'sass:map';
+@use './../../../styles.scss';
+@use './../../../styles/theme-colors.scss' as theme;
+
+.spinner {
+  display: flex;
+  margin: 30% auto;
+  z-index: 100;
+}
+
+.filter {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
+}
+
+.card-container {
+  max-width: 90%;
+  margin: 1em auto;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-gap: 1em;
+}
+
+.card {
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  height: auto;
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100%;
+    padding-left: 1rem;
+
+    /* h3 {
+      color: white;
+    } */
+
+    .card-title {
+      margin: 0.4em;
+
+      .mat-mdc-card-subtitle {
+        color: white;
+      }
+    }
+  }
+}
+
+.detail-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 6px 8px;
+}
+
+.detail-attribute {
+  flex: 1;
+
+  color: palegreen;
+  text-align: left;
+}
+
+.detail-value {
+  flex: 1;
+  text-align: right;
+}
+
+.card-title-sold {
+  margin: 0.4em;
+  color: map.get(theme.$primary, 80);
+
+  .mat-mdc-card-subtitle {
+    color: white;
+  }
+
+  &:hover {
+    box-shadow: 0 0 20px map.get(theme.$primary, 90);
+    transform: scale(1.04);
+
+    transition: box-shadow 1s ease-out, transform 1.3s ease-in-out;
+  }
+}
+
+.card-title-bought {
+  margin: 0.4em;
+  color: map.get(theme.$tertiary, 80);
+
+  .mat-mdc-card-subtitle {
+    color: white;
+  }
+
+  &:hover {
+    border-radius: 16px;
+    box-shadow: 0 0 20px map.get(theme.$tertiary, 80);
+    transform: scale(1.04);
+
+    transition: box-shadow 1s ease-out, transform 1.3s ease-in-out;
+  }
+}

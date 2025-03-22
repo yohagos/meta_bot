@@ -1,1 +1,35 @@
-<p>histories works!</p>
+@if ( histories$ | async ; as histories) {
+  <mat-form-field class="filter">
+    <mat-label>Filter</mat-label>
+    <mat-select [disabled]="!historyNames$.value" (valueChange)="applyFilter($event)">
+      <mat-option *ngFor="let item of historyNames$ | async" [value]="item">
+        {{item}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="card-container" *ngIf="filteredHistories$ | async as histories">
+    <div class="card-grid" >
+      <mat-card
+        class="card {{getScssClass(hist.transaction.transaction_type)}}"
+        *ngFor="let hist of histories">
+        <div class="card-content ">
+          <mat-card-title class="card-title">
+            <span matCardTitle>{{hist.coin.coin_name}}</span>
+            <span matCardSubtitle>{{hist.transaction.transaction_type}}</span>
+          </mat-card-title>
+          <mat-card-content>
+            <div class="detail-container">
+              <div class="detail">
+                <div class="detail-attribute"></div>
+                <div class="detail-value"></div>
+              </div>
+            </div>
+          </mat-card-content>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+} @else {
+  <mat-spinner class="spinner"></mat-spinner>
+}
