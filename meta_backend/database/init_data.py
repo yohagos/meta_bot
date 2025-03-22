@@ -184,14 +184,6 @@ async def create_test_data(session: AsyncSession):
     existing_histories = await session.exec(select(CoinHistory))
     existing_transactions = await session.exec(select(Transaction))
 
-    logger.warning(f"""
-        existing 
-        coins {existing_coins}, 
-        interests {existing_interests}, 
-        histories {existing_histories}, 
-        transactions {existing_transactions}
-    """)
-
     if existing_coins.first() is None:
         coins = [coin for coin in COIN_BASE_TEST_DATA]
         session.add_all(coins)
