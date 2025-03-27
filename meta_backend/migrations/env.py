@@ -12,6 +12,7 @@ from models.transactions import Transaction
 from models.coins_history import CoinHistory
 from models.coins_interest import CoinInterest
 from models.coin_stats import Stats
+from models.rabbitmq_config import RabbitMQConfig
 from configs import include_object
 import sys, os
 
