@@ -28,11 +28,29 @@
       "durable": true,
       "auto_delete": false,
       "arguments": {}
+    },
+    {
+      "name": "transaction_exchange",
+      "vhost": "/meta",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
     }
   ],
   "queues": [
     {
       "name": "coin_updates_queue",
+      "vhost": "/meta",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-max-length": 10000,
+        "x-message-ttl": 300000
+      }
+    },
+    {
+      "name": "transaction_queue",
       "vhost": "/meta",
       "durable": true,
       "auto_delete": false,
@@ -49,6 +67,14 @@
       "destination": "coin_updates_queue",
       "destination_type": "queue",
       "routing_key": "coin.update",
+      "arguments": {}
+    },
+    {
+      "source": "transaction_exchange",
+      "vhost": "/meta",
+      "destination": "transaction_queue",
+      "destination_type": "queue",
+      "routing_key": "transaction.process",
       "arguments": {}
     }
   ]
