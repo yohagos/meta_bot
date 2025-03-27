@@ -6,7 +6,11 @@ from .coins_interest import CoinInterest, CoinInterestBase, CoinInterestCreate, 
 
 from .coin_stats import CoinStats, Stats
 
+from .rabbitmq_config import RabbitMQConfig
+
 from .transactions import Transaction, TransactionBase, TransactionCreate, TransactionRead, TransactionUpdate
 
 from .enums import TransactionTypeEnum
+
+
 

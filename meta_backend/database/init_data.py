@@ -1,4 +1,4 @@
-import asyncio
+import asyncio, signal, sys
 from uuid import uuid4, UUID
 from typing import List
 from datetime import datetime, timezone
@@ -8,10 +8,18 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from configs import load_settings
-from models import Coin, CoinInterest, Transaction, TransactionTypeEnum, CoinHistory
-from database import AsyncSessionLocal
-from services import coin_api_polling_task
-from rabbitmq import start_consumer
+from models.coins import Coin
+from models.coins_interest import CoinInterest
+from models.coins_history import CoinHistory
+from models.transactions import Transaction
+from models.enums import TransactionTypeEnum
+from models.rabbitmq_config import RabbitMQConfig
+from database.db import AsyncSessionLocal
+from services.coin_api import coin_api_polling_task
+from services.websocket_manager import WebSocketManager
+from rabbitmq.connection import RabbitMQConnectionManager
+from rabbitmq.consumer import consumer, consumer_callback_with_app
+
 from utils import logger
 
 settings = load_settings()
@@ -33,7 +41,34 @@ _tx_id_6 = uuid4()
 _kc_user_1 = UUID('c9c6f233-2116-401b-b372-a7f05c2035a3')
 _kc_user_2 = UUID('07c7d7d2-e41d-4214-bccd-0e4c873b0c55')
 
-
+RABBITMQ_CONFIGS: List[RabbitMQConfig] = [
+    RabbitMQConfig(
+        id="transactions",
+        exchange_name=settings.MQ_TRANSACTION_EXCHANGE,
+        exchange_type='direct',
+        queue_name=settings.MQ_TRANSACTION_QUEUE,
+        routing_key=settings.MQ_TRANSACTION_ROUTING_KEY,
+        durable=True,
+        auto_delete=False,
+        arguments={
+            "x-max-length": 10000,
+            "x-message-ttl": 300000
+        }
+    ),
+    RabbitMQConfig(
+        id="coins",
+        exchange_name=settings.MQ_DATA_EXCHANGE,
+        exchange_type='direct',
+        queue_name=settings.MQ_DATA_QUEUE,
+        routing_key=settings.MQ_DATA_ROUTING_KEY,
+        durable=True,
+        auto_delete=False,
+        arguments={
+            "x-max-length": 10000,
+            "x-message-ttl": 300000
+        }
+    )
+]
 
 COIN_BASE_TEST_DATA: List[Coin] = [
     Coin(
@@ -178,11 +213,11 @@ TRANSACTION_TEST_DATA: List[Transaction] = [
 ]
 
 async def create_test_data(session: AsyncSession):
-    logger.warning("starting create test data")
     existing_coins = await session.exec(select(Coin))
     existing_interests = await session.exec(select(CoinInterest))
     existing_histories = await session.exec(select(CoinHistory))
     existing_transactions = await session.exec(select(Transaction))
+    existing_mq_configs = await session.exec(select(RabbitMQConfig))
 
     if existing_coins.first() is None:
         coins = [coin for coin in COIN_BASE_TEST_DATA]
@@ -200,23 +235,60 @@ async def create_test_data(session: AsyncSession):
         coins = [coin for coin in TRANSACTION_TEST_DATA]
         session.add_all(coins)
 
+    if existing_mq_configs.first() is None:
+        confs = [conf for conf in RABBITMQ_CONFIGS]
+        session.add_all(confs)
+
     await session.commit()
 
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await start_consumer()
-
-    async with AsyncSessionLocal() as session:
-        task = asyncio.create_task(coin_api_polling_task(session))
-        if settings.MODE == 'dev':
+    if settings.MODE == 'dev':
+        async with AsyncSessionLocal() as session:
             await create_test_data(session)
+
+            mq_configs = await session.exec(select(RabbitMQConfig))
+
+    mq_manager = RabbitMQConnectionManager()
+    app.state.mq_manager = mq_manager
+    app.state.ws_manager = WebSocketManager()
+    tasks = []
+    stop_event = asyncio.Event()
+
+    try:
+        await mq_manager.get_connection()
+        tasks.append(asyncio.create_task(coin_api_polling_task(app, stop_event)))
+        if mq_configs:
+            for conf in mq_configs:
+                tasks.append(
+                    asyncio.create_task(
+                        consumer(
+                            mq_manager, 
+                            conf, 
+                            consumer_callback_with_app(app, conf)
+                        )
+                    )
+                )
+
         yield
-        task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
+    
+    finally:
+        stop_event.set()
+        for task in tasks:
+            if task and not task.done():
+                task.cancel()
+            
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    logger.info("Background task canceled : CanceledError")
+                except KeyboardInterrupt:
+                    logger.info("Background task canceled : KeyboardInterrupt")
+                except Exception as e:
+                    logger.error(f"Error during task cancelation : {str(e)}")
+        await mq_manager.close()
+        del app.state.mq_manager
 
     
