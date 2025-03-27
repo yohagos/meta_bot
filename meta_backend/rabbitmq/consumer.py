@@ -1,70 +1,72 @@
 import asyncio, json
-from typing import Set, Optional
+from typing import Set, Optional, Callable, Awaitable
+from fastapi import FastAPI
 from fastapi.websockets import WebSocket
+from aio_pika import IncomingMessage, ExchangeType
 
 from configs import load_settings
 from utils import logger
-from . import rabbitmq_connection
+from rabbitmq.connection import RabbitMQConnectionManager
+from models.rabbitmq_config import RabbitMQConfig
+from services.websocket_manager import WebSocketManager
+
 
 settings = load_settings()
 
-active_websocktes: Set[WebSocket] = set()
+async def consumer(
+        manager: RabbitMQConnectionManager,
+        config: RabbitMQConfig,
+        callback: Callable[[IncomingMessage], Awaitable[None]]
+) -> None:
+    channel = await manager.get_channel()
+    exchange = await manager.get_exchange(
+        exchange_name=config.exchange_name,
+        exchange_type=config.exchange_type,
+        durable=config.durable,
+        auto_delete=config.auto_delete
+    )
 
-last_message: Optional[dict]
+    queue = await channel.declare_queue(
+        name=config.queue_name,
+        durable=config.durable,
+        auto_delete=config.auto_delete,
+        arguments=config.arguments
+    )
 
-async def add_websocket(websocket: WebSocket):
-    await websocket.accept()
-    active_websocktes.add(websocket)
-    global last_message
-
-    if last_message is not None:
-        try: 
-            await websocket.send_json(last_message)
-        except Exception:
-            pass
-
-    try:
-        while True:
-            message = await websocket.receive_text()
-    except Exception:
-        active_websocktes.remove(websocket)
-    finally:
-        active_websocktes.discard(websocket)
-
-
-async def broadcast_data(data: dict):
-    global last_message
-    last_message = data
-    disconnected_clients = set()
-
-    for ws in active_websocktes:
-        try: 
-            await ws.send_json(data)
-        except:
-            disconnected_clients.add(ws)
-    
-    for ws in disconnected_clients:
-        active_websocktes.remove(ws)
-        
-
-async def consume():
-    await rabbitmq_connection.connect()
-    channel = rabbitmq_connection.channel
-    queue = await channel.get_queue(settings.MQ_QUEUE)
+    await queue.bind(
+        exchange=exchange,
+        routing_key=config.routing_key
+    )
 
     async with queue.iterator() as queue_iter:
-        while True:
+        async for message in queue_iter:
             try:
-                message = await queue_iter.__anext__()
-                async with message.process():
-                    data = json.loads(message.body.decode())
-                    await broadcast_data(data)
-            except asyncio.CancelledError:
-                break
+                await callback(message)
             except Exception as e:
-                logger.warning("error occurred in consume()")
-                await asyncio.sleep(1)
+                logger.error(f"Error processing message : {str(e)}")
+                continue
 
-
-async def start_consumer():
-    asyncio.create_task(consume())
+async def consumer_callback(
+        message: IncomingMessage,
+        app: FastAPI,
+        conf: RabbitMQConfig
+) -> None:
+    async with message.process():
+        try:
+            payload = json.loads(message.body.decode())
+            if isinstance(payload, list):
+                text = json.dumps(payload)
+                await app.state.ws_manager.broadcast(conf.exchange_name, text)
+            elif isinstance(payload, dict):
+                text = json.dumps(payload)
+                await app.state.ws_manager.broadcast(conf.exchange_name, text)
+            else:
+                raise ValueError("Unexpected payload type")
+            
+        except Exception as e:
+            logger.error(f"Error consumer : {str(e)}")
+            
+def consumer_callback_with_app(app: FastAPI, conf: RabbitMQConfig):
+    async def _callback(message: IncomingMessage) -> None:
+        await consumer_callback(message, app, conf)
+    return _callback
