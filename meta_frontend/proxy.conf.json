@@ -2,12 +2,12 @@
   "/api": {
     "target": "http://localhost:8000",
     "secure": true,
-    "logLevel": "debug",
     "changeOrigin": true
   },
   "/sockets": {
     "target": "ws://localhost:8000",
     "ws": true,
+    "secure": true,
     "changeOrigin": true
   }
 }
