@@ -19,6 +19,8 @@ from models import (
     Stats
 )
 
+from utils import logger
+
 interest_v1_router = APIRouter(
     prefix="/api/v1/interest",
     tags=["Coin Interest"]
@@ -62,11 +64,11 @@ async def update(
 ):
     return update_ci_by_id(ci_id, ci, kc_service, session)
 
-@interest_v1_router.delete("/{ci_id}", response_model=CoinInterestRead)
+@interest_v1_router.delete("/delete/{coin_id}", response_model=CoinInterestRead)
 async def delete(
-    ci_id: UUID,
+    coin_id: str,
     session: SessionDep,
     user: dict = Depends(get_current_user),
     kc_service: KeycloakUserService = Depends(get_keycloak_service),
 ):
-    return delete_ci_by_id(ci_id, session, kc_service)
+    return delete_ci_by_id(coin_id, session)

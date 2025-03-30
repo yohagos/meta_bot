@@ -52,35 +52,19 @@ async def consumer_groups(
     return ids
 
 
-@sockets_v1_router.websocket("/ws/{group}")
-async def websocket_endpoint(
-    group: str,
-    websocket: WebSocket,
-    session: AsyncSessionDep
+@sockets_v1_router.websocket("/ws/all")
+async def websocket(
+    websocket: WebSocket
 ):
-    if group is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Group {group} not found"
-        )
-    
-    config = await session.get(RabbitMQConfig, group)
-    if config is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Group {group} not found"
-        )
-    
-    ws_manager: WebSocketManager = websocket.app.state.ws_manager
-
-    #await ws_manager.disconnect(websocket)
-
     await websocket.accept()
-    await ws_manager.connect(config.exchange_name, websocket)
+
+    ws_manager = websocket.app.state.ws_manager
+    await ws_manager.connect('all', websocket)
 
     try:
         while True:
             await websocket.receive_text()
-    except Exception:
-        ws_manager.disconnect(group, websocket)
+    except Exception as e:
+        logger.error(f"Websocket error : {str(e)}")
+        ws_manager.disconnect('all', websocket)
     
