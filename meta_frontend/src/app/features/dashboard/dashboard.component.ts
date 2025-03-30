@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, inject, OnDestroy, ViewChild } from '@angular/core';
 import { SocketService } from './services/socket.service';
-import { Stats } from '../../services/models';
+import { Stats, TransactionRead } from '../../services/models';
 import { CommonModule } from '@angular/common';
 
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -12,134 +12,65 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { TextFormatPipe } from '../../core/pipes/text-format.pipe';
 import { InterestService } from '../interests/services/interest.service';
+import { CategoryService } from './services/category.service';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { map, of } from 'rxjs';
+import { Router, RouterModule } from '@angular/router';
+
+type Navigation = {
+  category: string
+  uri: string
+}
 
 @Component({
   selector: 'app-dashboard',
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
 
     MatButtonModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatTableModule,
+    MatSelectModule,
     MatSortModule,
     MatProgressSpinnerModule,
 
-    TextFormatPipe,
+    TextFormatPipe
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnDestroy, AfterViewInit {
-  loading = true
-  private _socketService = inject(SocketService)
-  private _interestedCoinService = inject(InterestService)
+export class DashboardComponent {
+  private _categoryService = inject(CategoryService)
+  private _router = inject(Router)
 
-  private currentStat = new Map<string, Stats>()
+  navigation: Navigation[] = [
+    {
+      category: 'all',
+      uri: 'dashboard'
+    },
+    {
+      category: 'transactions',
+      uri: 'dashboard/transactions'
+    },
+    {
+      category: 'coins',
+      uri: 'dashboard/stats'
+    },
+  ]
 
-  displayColumns = ['rank', 'data_id', 'name', 'symbol']
-  displayColumnsExtra = [...this.displayColumns, 'expand']
-  dataSource = new MatTableDataSource<Stats>([])
+  categories$ = this._categoryService.getCategories()
 
-  @ViewChild(MatSort) sort!: MatSort
-
-  expandedElementId!: string | null
-
-  constructor() {
-    this._socketService.wsSubject$.subscribe((data) => {
-      this.handleNewData(data)
-    })
-  }
-
-  ngAfterViewInit(): void {
-      this.dataSource.sort = this.sort
-  }
-
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value
-        this.dataSource.filter = filterValue.trim().toLowerCase()
-
-        this.dataSource.filterPredicate = (data: Stats, filter: string) => {
-          return data.name.toLowerCase().includes(filter) ||
-                  data.data_id.toLowerCase().includes(filter) ||
-                  data.symbol.toLowerCase().includes(filter)
-        }
-  }
-
-  toggleElement(element: Stats) {
-    this.expandedElementId = this.isExpanded(element) ? null : element.data_id
-  }
-
-  isExpanded(element: Stats) {
-    return this.expandedElementId === element.data_id
-  }
-
-  private handleNewData(stats: Stats[]) {
-    const changes = this.detectChanges(stats)
-
-    if (changes.newEntries.length > 0 || changes.updateEntries.length > 0) {
-      this.dataSource.data = this.getSortedData()
-    }
-
-    this.loading = false
-  }
-
-  private detectChanges(stats: Stats[]): {
-    newEntries: Stats[],
-    updateEntries: Stats[]
-  } {
-    const result: {
-      newEntries: Stats[],
-      updateEntries: Stats[]
-    } = {
-      newEntries: [],
-      updateEntries: []
-    }
-
-    for (const stat of stats) {
-      const existing = this.currentStat.get(stat.data_id)
-      if (!existing) {
-        result.newEntries.push(stat)
-        this.currentStat.set(stat.data_id, stat)
-      } else if (existing.rank !== stat.rank) {
-        result.updateEntries.push(stat)
-        this.currentStat.set(stat.data_id, stat)
-      }
-    }
-
-    return result
-  }
-
-  private getSortedData() {
-    return Array.from(this.currentStat.values())
-      .sort((a: Stats, b: Stats) => Number(a.rank)  - Number(b.rank))
-  }
-
-  private highlightChanges(changes: { newEntries: Stats[], updatedEntries: Stats[] }) {
-    changes.newEntries.forEach(stat =>
-      this.animateElement(stat.data_id, 'new-entry'));
-
-    changes.updatedEntries.forEach(stat =>
-      this.animateElement(stat.data_id, 'rank-changed'));
-  }
-
-  private animateElement(coinId: string, animationClass: string) {
-    const element = document.getElementById(coinId);
-    if (element) {
-      element.classList.add(animationClass);
-      setTimeout(() =>
-        element.classList.remove(animationClass), 1000);
-    }
-  }
-
-  addToInterested(element: Stats) {
-    this._interestedCoinService.addStatsCoin(element)
-  }
-
-  ngOnDestroy(): void {
-      this._socketService.disconnect()
+  categoryChanges(event: Event) {
+    const category = event as unknown
+    const result = (category as string).toLowerCase()
+    const uri = this.navigation.find(item => item.category === result)?.uri
+    if (uri) this._router.navigate([`${uri}`])
   }
 
 }
