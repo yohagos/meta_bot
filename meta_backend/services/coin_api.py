@@ -52,7 +52,21 @@ async def clear_stats_data(session: AsyncSession):
 async def coin_api_polling_task(app: FastAPI, stop_event: asyncio.Event):
     async with AsyncSessionLocal() as session:
         config = await load_exchange_info(session)
+        last_data: List[Stats] = await session.exec(select(Stats))
+
     mq_manager = app.state.mq_manager
+
+    if last_data and mq_manager and config:
+        last_payload = json.dumps(
+            [item.model_dump() for item in last_data],
+            default=str
+        ).encode()
+        await publish_message(
+            mq_manager,
+            config,
+            last_payload
+        )
+
     while not stop_event.is_set():
         try: 
             start_time = asyncio.get_event_loop().time()
