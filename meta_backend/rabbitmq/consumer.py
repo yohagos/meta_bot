@@ -46,7 +46,23 @@ async def consumer(
                 logger.error(f"Error processing message : {str(e)}")
                 continue
 
-async def consumer_callback(
+async def consumer_callback_to_queue(
+        message: IncomingMessage,
+        shared_queue: asyncio.Queue
+) -> None:
+    async with message.process():
+        try:
+            payload = json.loads(message.body.decode())
+            await shared_queue.put(payload)
+        except Exception as e:
+            logger.error(f"Error consumer : {str(e)}")
+            
+def consumer_callback_with_queue(app: FastAPI, config: RabbitMQConfig):
+    async def _callback(message: IncomingMessage) -> None:
+        await consumer_callback_to_queue(message, app.state.shared_queue)
+    return _callback
+
+""" async def consumer_callback(
         message: IncomingMessage,
         app: FastAPI,
         conf: RabbitMQConfig
@@ -69,4 +85,4 @@ async def consumer_callback(
 def consumer_callback_with_app(app: FastAPI, conf: RabbitMQConfig):
     async def _callback(message: IncomingMessage) -> None:
         await consumer_callback(message, app, conf)
-    return _callback
+    return _callback """

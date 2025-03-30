@@ -27,5 +27,5 @@ async def publish_message(
         )
         await exchange.publish(message=message, routing_key=config.routing_key)
     except aio_pika.exceptions.AMQPError as e:
-        logger.error(f"Publish error : {str(e)}")
+        logger.error(f"Publish error : {e}")
         raise
