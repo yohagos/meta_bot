@@ -17,8 +17,10 @@ from models.rabbitmq_config import RabbitMQConfig
 from database.db import AsyncSessionLocal
 from services.coin_api import coin_api_polling_task
 from services.websocket_manager import WebSocketManager
+from services.transaction_bot import transaction_bot, transactions_task
 from rabbitmq.connection import RabbitMQConnectionManager
-from rabbitmq.consumer import consumer, consumer_callback_with_app
+from rabbitmq.consumer import consumer, consumer_callback_with_queue
+from rabbitmq.aggregatory import aggregator
 
 from utils import logger
 
@@ -67,6 +69,19 @@ RABBITMQ_CONFIGS: List[RabbitMQConfig] = [
             "x-max-length": 10000,
             "x-message-ttl": 300000
         }
+    ),
+    RabbitMQConfig(
+        id="all",
+        exchange_name=settings.MQ_AGGREGATE_EXCHANGE,
+        exchange_type='direct',
+        queue_name=settings.MQ_AGGREGATE_QUEUE,
+        routing_key=settings.MQ_AGGREGATE_ROUTING_KEY,
+        durable=True,
+        auto_delete=False,
+        arguments={
+            "x-max-length": 10000,
+            "x-message-ttl": 300000
+        }
     )
 ]
 
@@ -83,7 +98,7 @@ COIN_BASE_TEST_DATA: List[Coin] = [
     ),
     Coin(
         id=_coin_id_3,
-        coin_name='Ripple',
+        coin_name='XRP',
         coin_symbol='XRP', 
     ),
     Coin(
@@ -216,7 +231,6 @@ async def create_test_data(session: AsyncSession):
     existing_coins = await session.exec(select(Coin))
     existing_interests = await session.exec(select(CoinInterest))
     existing_histories = await session.exec(select(CoinHistory))
-    existing_transactions = await session.exec(select(Transaction))
     existing_mq_configs = await session.exec(select(RabbitMQConfig))
 
     if existing_coins.first() is None:
@@ -227,13 +241,9 @@ async def create_test_data(session: AsyncSession):
         coins = [coin for coin in COIN_INTEREST_TEST_DATA]
         session.add_all(coins)
 
-    if existing_histories.first() is None:
+    """ if existing_histories.first() is None:
         coins = [coin for coin in COIN_HISTORY_TEST_DATA]
-        session.add_all(coins)
-
-    if existing_transactions.first() is None:
-        coins = [coin for coin in TRANSACTION_TEST_DATA]
-        session.add_all(coins)
+        session.add_all(coins) """
 
     if existing_mq_configs.first() is None:
         confs = [conf for conf in RABBITMQ_CONFIGS]
@@ -245,15 +255,19 @@ async def create_test_data(session: AsyncSession):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    mq_configs = []
     if settings.MODE == 'dev':
         async with AsyncSessionLocal() as session:
             await create_test_data(session)
 
-            mq_configs = await session.exec(select(RabbitMQConfig))
+            result = await session.exec(select(RabbitMQConfig))
+            mq_configs = result.all()
 
     mq_manager = RabbitMQConnectionManager()
     app.state.mq_manager = mq_manager
     app.state.ws_manager = WebSocketManager()
+    shared_queue: asyncio.Queue = asyncio.Queue()
+    app.state.shared_queue = shared_queue
     tasks = []
     stop_event = asyncio.Event()
 
@@ -267,11 +281,14 @@ async def lifespan(app: FastAPI):
                         consumer(
                             mq_manager, 
                             conf, 
-                            consumer_callback_with_app(app, conf)
+                            consumer_callback_with_queue(app, conf)
                         )
                     )
                 )
-
+        
+        tasks.append(asyncio.create_task(transaction_bot(stop_event)))
+        tasks.append(asyncio.create_task(transactions_task(app, stop_event)))
+        tasks.append(asyncio.create_task(aggregator(app, shared_queue, stop_event)))
         yield
     
     finally:
@@ -290,5 +307,7 @@ async def lifespan(app: FastAPI):
                     logger.error(f"Error during task cancelation : {str(e)}")
         await mq_manager.close()
         del app.state.mq_manager
+        del app.state.ws_manager
+        del app.state.shared_queue
 
     
