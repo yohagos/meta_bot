@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import Keycloak from "keycloak-js";
 import { KEYCLOAK_EVENT_SIGNAL, KeycloakEventType, ReadyArgs, typeEventArgs } from 'keycloak-angular';
 import { DrawerMenu } from './drawer.menu.model';
+import { SocketService } from '../../features/dashboard/services/socket.service';
 
 
 @Component({
@@ -42,6 +43,8 @@ export class HeaderComponent {
   keycloakStatus: string | undefined
   private _keycloak = inject(Keycloak)
   private _keycloakSignal = inject(KEYCLOAK_EVENT_SIGNAL)
+
+  private _socketService = inject(SocketService)
 
   _router = inject(Router)
 
@@ -92,6 +95,7 @@ export class HeaderComponent {
         case KeycloakEventType.Ready:
           this.authenticated = typeEventArgs<ReadyArgs>(keycloakEvent.args)
           if (this.authenticated) {
+            this._socketService.connect()
             this._router.navigate(['overview'])
           }
           break
@@ -102,6 +106,7 @@ export class HeaderComponent {
           break
 
         case KeycloakEventType.AuthLogout:
+          this._socketService.disconnect()
           this.authenticated = false
           this._router.navigate([''])
           break

@@ -4,6 +4,7 @@ import { TokenService } from '../../../core/services/token.service';
 import { CoinInterestCreate, CoinInterestRead, Stats } from '../../../services/models';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { BehaviorSubject } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ export class InterestService {
   private _snackbarService = inject(SnackbarService)
   private _interestApi = inject(CoinInterestService)
   private _tokenService = inject(TokenService)
+  private _router = inject(Router)
 
   private _interestSubject = new BehaviorSubject<CoinInterestRead[]>([])
   interest$ = this._interestSubject.asObservable()
@@ -50,9 +52,11 @@ export class InterestService {
     }).subscribe({
       next: (data) => {
         this._interestSubject.next(data)
+        console.log(data)
       },
       error: (err: Error) => {
         this._snackbarService.openSnackBar(`Could not load favorites`, 'error')
+        this._router.navigate(['/overview'])
       }
     })
   }
@@ -67,5 +71,33 @@ export class InterestService {
 
   getInterestById(coin_id: string) {
     return this._interestApi.getByIdApiV1InterestCoinIdGet({coin_id})
+  }
+
+  checkExistence(element: Stats) {
+    return this._interestSubject.value.some(
+      item => item.stats?.symbol.toLowerCase() === element.symbol.toLowerCase() ||
+              item.coin?.coin_symbol.toLowerCase() === element.symbol.toLowerCase()
+    )
+  }
+
+  removeInterestById(element: Stats) {
+    console.log(element)
+    const data: CoinInterestRead | undefined = this._interestSubject.value.find(item =>
+    {
+      if (
+        (item.coin && item.coin.coin_symbol.toLowerCase() === element.symbol.toLowerCase()) ||
+        (item.stats && item.stats.symbol.toLowerCase() === element.symbol.toLowerCase())
+      ) {
+        return item
+      }
+      return
+    }
+    )
+    if (data) {
+      this._interestApi.deleteApiV1InterestDeleteCoinIdDelete({
+        coin_id: data.id
+      }).subscribe(res => console.log("delete response : ", res))
+    }
+    this._loadInterests()
   }
 }
