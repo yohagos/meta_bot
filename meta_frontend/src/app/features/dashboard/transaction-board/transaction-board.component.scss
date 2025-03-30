@@ -1,0 +1,77 @@
+@use 'sass:map';
+@use '../../../../styles/theme-colors.scss' as theme;
+
+.spinner {
+  display: flex;
+  margin: 30% auto;
+  z-index: 100;
+}
+
+.card-container {
+  max-width: 90%;
+  margin: 1em auto;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-gap: 1em;
+}
+
+.card {
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  height: auto;
+  margin: 1em;
+
+  .card-content {
+    display: flex;
+    border-radius: 16px;
+
+    .left-section {
+      flex: 4;
+      margin: auto 1em;
+    }
+
+    .right-section {
+      flex: 3;
+      margin: auto 1em;
+      align-items: flex-end;
+    }
+  }
+}
+
+.card-sold {
+  margin: 0.4em;
+  color: map.get(theme.$primary, 80);
+  border-radius: 16px;
+
+  .mat-mdc-card-subtitle {
+    color: white;
+  }
+
+  &:hover {
+    box-shadow: 0 0 20px map.get(theme.$primary, 90);
+    transform: scale(1.04);
+
+    transition: box-shadow 1s ease-out, transform 1.3s ease-in-out;
+  }
+}
+
+.card-bought {
+  margin: 0.4em;
+  color: map.get(theme.$tertiary, 80);
+  border-radius: 16px;
+
+  .mat-mdc-card-subtitle {
+    color: white;
+  }
+
+  &:hover {
+    box-shadow: 0 0 20px map.get(theme.$tertiary, 80);
+    transform: scale(1.04);
+
+    transition: box-shadow 1s ease-out, transform 1.3s ease-in-out;
+  }
+}

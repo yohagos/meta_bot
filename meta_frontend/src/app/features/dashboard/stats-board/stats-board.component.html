@@ -1,0 +1,145 @@
+@if (statsLoading) {
+  <mat-spinner class="spinner"></mat-spinner>
+} @else {
+  <div class="filters">
+    <mat-form-field>
+      <mat-label>Filter</mat-label>
+      <input matInput (keyup)="applyStatsFilter($event)" #input />
+    </mat-form-field>
+  </div>
+  <table
+    mat-table
+    [dataSource]="dataSource"
+    multiTemplateDataRows
+    class="mat-elevation-z12"
+    matSort
+  >
+    @for (item of displayColumns; track $index) {
+    <ng-container matColumnDef="{{ item }}">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>
+        @if (item === 'data_id') { Key } @else {
+        {{ item | textFormat }}
+        }
+      </th>
+      <td mat-cell *matCellDef="let element" [id]="element.data_id">
+        <span class="rank-cell"> {{ element[item] }} </span>
+      </td>
+    </ng-container>
+    }
+
+    <ng-container matColumnDef="expand">
+      <th mat-header-cell *matHeaderCellDef>&nbsp;</th>
+      <td mat-cell *matCellDef="let element">
+        <button
+          mat-icon-button
+          class="toggle-button"
+          [class.toggle-button-expanded]="isExpanded(element)"
+          (click)="toggleElement(element); $event.stopPropagation()"
+        >
+          <mat-icon> keyboard_arrow_down </mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="expandedDetail">
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [attr.colspan]="displayColumnsExtra.length"
+      >
+        <div
+          class="detail-wrapper"
+          [ngClass]="{ 'detail-wrapper-expanded': isExpanded(element) }"
+        >
+          <div class="detail">
+            <div class="element-container">
+              <div *ngIf="element.supply" class="data-item">
+                <i>Supply: </i>
+                {{ element.supply | currency : "USD" : "symbol" : "1.2-4" }} /
+                {{ element.supply | currency : "EUR" : "symbol" : "1.2-4" }}
+              </div>
+              <div *ngIf="element.maxSupply" class="data-item">
+                <i>Max. Supply: </i
+                >{{ element.maxSupply | currency : "USD" : "symbol" : "1.2-2" }} /
+                {{ element.maxSupply | currency : "EUR" : "symbol" : "1.2-2" }}
+              </div>
+              <div *ngIf="element.priceUsd" class="data-item">
+                <i>Price USD / EUR: </i>
+                {{ element.priceUsd | currency : "USD" : "symbol" : "1.2-2" }} /
+                {{ element.priceUsd | currency : "EUR" : "symbol" : "1.2-2" }}
+              </div>
+              <div *ngIf="element.marketCapUsd" class="data-item">
+                <i>Market Cap USD / EUR: </i>
+                {{
+                  element.marketCapUsd | currency : "USD" : "symbol" : "1.2-2"
+                }}
+                /
+                {{ element.marketCapUsd | currency : "EUR" : "symbol" : "1.2-2" }}
+              </div>
+              <div *ngIf="element.volumeUsd24Hr" class="data-item">
+                <i>Volume USD / EUR in 24 Hour: </i>
+                {{
+                  element.volumeUsd24Hr | currency : "USD" : "symbol" : "1.2-2"
+                }}
+                /
+                {{
+                  element.volumeUsd24Hr | currency : "EUR" : "symbol" : "1.2-2"
+                }}
+              </div>
+              <div *ngIf="element.vwap24Hr" class="data-item">
+                <i>VWAP 24 in Hour: </i>
+                {{ element.vwap24Hr | currency : "USD" : "symbol" : "1.2-2" }} /
+                {{ element.vwap24Hr | currency : "EUR" : "symbol" : "1.2-2" }}
+              </div>
+              <div *ngIf="element.changePercent24Hr" class="data-item">
+                <i>Change Percent in 24 Hour: </i>
+                {{ element.changePercent24Hr | number : "1.0-3" }} %
+              </div>
+              <div *ngIf="element.explorer" class="data-item">
+                <i>Explorer: </i>
+                <a class="explorer-link" href="{{ element.explorer }}">Link</a>
+              </div>
+            </div>
+            <button
+              mat-fab
+              (click)="addToInterested(element)"
+              class="fav-button"
+              *ngIf="!checkExistenceInInterests(element)"
+              >
+              <mat-icon> favorite </mat-icon>
+            </button>
+            <button
+              mat-fab
+              (click)="removeFromInterested(element)"
+              class="fav-delete-button"
+              *ngIf="checkExistenceInInterests(element)"
+              >
+              <mat-icon> delete </mat-icon>
+            </button>
+          </div>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayColumnsExtra"></tr>
+
+    <tr
+      mat-row
+      *matRowDef="let element; columns: displayColumnsExtra"
+      (click)="toggleElement(element)"
+    ></tr>
+
+    <tr
+      mat-row
+      *matRowDef="let row; columns: ['expandedDetail']"
+      class="detail-row"
+    ></tr>
+
+    <tr *matNoDataRow>
+      <td class="mat-cell" colspan="1">
+        No data matching the Filter "{{ input.value }}"
+      </td>
+    </tr>
+  </table>
+
+}

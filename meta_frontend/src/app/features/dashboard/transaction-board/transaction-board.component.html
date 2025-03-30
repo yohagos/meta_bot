@@ -1,0 +1,16 @@
+<div class="card-container" *ngIf="filteredTransactions$ | async as transactions">
+  <div class="card-grid">
+    <mat-card class="card {{getScssClass(tx.transaction_type)}}" *ngFor="let tx of transactions">
+      <div class="card-content" *ngIf="tx.coin">
+        <div class="left-section">
+          <h4> {{tx.coin.coin_name}} </h4>
+        </div>
+        <div class="right-section">
+          <p>Amount:  {{tx.amount}} </p>
+          <p>Price:  {{tx.price | number}} $ </p>
+          <p> {{tx.transaction_type | textFormat}} </p>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+</div>
