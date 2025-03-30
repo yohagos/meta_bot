@@ -30,9 +30,14 @@ class Settings(BaseSettings):
     MQ_DATA_EXCHANGE: str = os.getenv('MQ_DATA_EXCHANGE')
     MQ_DATA_QUEUE: str = os.getenv('MQ_DATA_QUEUE')
     MQ_DATA_ROUTING_KEY: str = os.getenv('MQ_DATA_ROUTING_KEY')
+
     MQ_TRANSACTION_EXCHANGE: str = os.getenv('MQ_TRANSACTION_EXCHANGE')
     MQ_TRANSACTION_QUEUE: str = os.getenv('MQ_TRANSACTION_QUEUE')
     MQ_TRANSACTION_ROUTING_KEY: str = os.getenv('MQ_TRANSACTION_ROUTING_KEY')
+
+    MQ_AGGREGATE_EXCHANGE: str = os.getenv('MQ_AGGREGATE_EXCHANGE')
+    MQ_AGGREGATE_QUEUE: str = os.getenv('MQ_AGGREGATE_QUEUE')
+    MQ_AGGREGATE_ROUTING_KEY: str = os.getenv('MQ_AGGREGATE_ROUTING_KEY')
 
     MODE: str = os.getenv('MODE')
 

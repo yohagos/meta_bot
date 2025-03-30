@@ -23,7 +23,6 @@ class KeycloakUserService:
             )
         except Exception as e:
             logger.error(f"Keycloak ERROR : {str(e)}")
-            logging.error("Keycloak error")
             return None
 
 def get_keycloak_admin() -> KeycloakAdmin:
@@ -32,7 +31,7 @@ def get_keycloak_admin() -> KeycloakAdmin:
         realm_name=settings.KEYCLOAK_REALM,
         client_id=settings.KEYCLOAK_CLIENT_ID,
         client_secret_key=settings.KEYCLOAK_CLIENT_SECRET,
-        verify=True
+        verify=False
     )
 
 def get_keycloak_service(kc_admin: KeycloakAdmin = Depends(get_keycloak_admin)) -> KeycloakUserService:
