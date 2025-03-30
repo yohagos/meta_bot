@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from sqlmodel import select
+from sqlmodel import select, or_, and_
 from uuid import UUID
 from typing import List, Tuple
 
@@ -15,6 +15,8 @@ from models import (
     Stats,
     Coin
 )
+
+from utils import logger
 
 def load_ci(
     kc_service: KeycloakUserService,
@@ -147,26 +149,20 @@ def update_ci_by_id(
 
 def delete_ci_by_id(
     ci_id: UUID,
-    session: SessionDep,
-    kc_service: KeycloakUserService
-):
+    session: SessionDep
+) -> CoinInterestRead:
     if not ci_id:
         raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail='Id not provided'
         )
-    ci = session.get(CoinInterest, ci_id)
+    ci = session.exec(select(CoinInterest).where(CoinInterest.id == ci_id)).first()
     if not ci:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='CoinInterest not found'
         )
+    response = CoinInterestRead.model_validate(ci)
     session.delete(ci)
     session.commit()
-    return CoinInterestRead.model_validate(
-        ci,
-        update={
-            'user': kc_service.get_user_info(ci.keycloak_user_id),
-            'coin': ci.coin
-        }
-    )
+    return response
