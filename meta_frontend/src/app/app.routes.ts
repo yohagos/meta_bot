@@ -47,7 +47,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
-    component: DashboardComponent,
+    loadChildren: () => import('./features/dashboard/dashboard.routes').then(mod => mod.routes),
     canActivate: [ canActivateAuthRole ],
     data: { role: 'User' }
   },
