@@ -1,15 +1,12 @@
-# META BOT
+# MetaBot (Crypto Bot - Derivation from MetaMask)
 
-## TechStack
+A Fullstack Application, which for now simulates, grabbing information from an API of top 100 crypto coins and simulating selling and buying of those which the user favored.
 
-- docker
-- python
-- fastapi
-- angular
-- echarts
+While implementing the app, I predefined bitcoin, xrp and ethereum as my favored coins. 
 
+## 🚀 About Me
 
-... will be continued
+A nerdy coder from Germany! Personally, I don't like talking about myself. As you can see from my GitHub profile, I am constantly learning and deepening my knowledge. 
 
 
 <h3 align="left">Languages and Tools:</h3>
@@ -24,8 +21,5 @@
   <a href="https://www.rabbitmq.com" target="_blank" rel="noreferrer"> <img src="https://www.vectorlogo.zone/logos/rabbitmq/rabbitmq-icon.svg" alt="rabbitMQ" width="40" height="40"/> </a> 
   <a href="https://sass-lang.com" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/sass/sass-original.svg" alt="sass" width="40" height="40"/> </a> 
   <a href="https://www.typescriptlang.org/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> </a> 
-
   <a href="https://www.keycloak.org/" target="_blank" rel="noreferrer"> <img src="https://github.com/keycloak/keycloak-misc/blob/main/logo/logo.svg" alt="typescript" width="40" height="40"/> </a> 
-
-  <a href="https://www.typescriptlang.org/" target="_blank" rel="noreferrer"> <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" alt="typescript" width="40" height="40"/> </a> 
 </p>
