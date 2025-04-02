@@ -1,28 +1,31 @@
 import { Component, inject } from '@angular/core';
 import { TokenService } from '../../core/services/token.service';
-import { CommonModule } from '@angular/common';
+import {
+  CommonModule,
+  DatePipe,
+  DecimalPipe,
+} from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { Router } from '@angular/router';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 
 @Component({
   selector: 'app-overview',
-  imports: [
-    CommonModule,
-    MatButtonModule
-  ],
+  imports: [CommonModule, MatButtonModule, NgxEchartsModule],
   templateUrl: './overview.component.html',
-  styleUrl: './overview.component.scss'
+  styleUrl: './overview.component.scss',
+  providers: [DatePipe, DecimalPipe],
 })
 export class OverviewComponent {
-  private _tokenService = inject(TokenService)
-  private _router = inject(Router)
+  private _tokenService = inject(TokenService);
+  private _router = inject(Router);
 
   constructor() {
-    this._tokenService.loadUserInformations()
+    this._tokenService.loadUserInformations();
   }
 
   openinterest() {
-    this._router.navigate(['dashboard'])
+    this._router.navigate(['dashboard']);
   }
 }
