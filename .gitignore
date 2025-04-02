@@ -185,3 +185,5 @@ mq_data
 .vscode
 
 meta_backend/migrations/versions
+
+example.data.ts

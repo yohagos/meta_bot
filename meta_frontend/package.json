@@ -28,6 +28,7 @@
     "keycloak-js": "^26.2.0",
     "lodash": "^4.17.21",
     "ng-openapi-gen": "^0.52.0",
+    "ngx-echarts": "^19.0.0",
     "rxjs": "~7.8.0",
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3",
