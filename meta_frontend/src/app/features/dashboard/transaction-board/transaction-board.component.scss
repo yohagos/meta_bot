@@ -75,3 +75,19 @@
     transition: box-shadow 1s ease-out, transform 1.3s ease-in-out;
   }
 }
+
+.pie-container {
+  max-width: 90%;
+  margin: 0.4em auto;
+
+  .pies {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-gap: 0.5em;
+
+    .pie-chart {
+      overflow: hidden;
+      height: auto;
+    }
+  }
+}

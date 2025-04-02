@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { AfterContentChecked, AfterContentInit, Component, inject, OnInit } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { AfterContentChecked, AfterContentInit, Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -14,6 +14,13 @@ import { BehaviorSubject, combineLatest, map, Observable, of, startWith } from '
 import { TransactionRead } from '../../../services/models';
 import { MatCardModule } from '@angular/material/card';
 import { TextFormatPipe } from '../../../core/pipes/text-format.pipe';
+import * as ECharts from "echarts";
+import { TransactionData } from '../example.data';
+import { NgxEchartsModule } from 'ngx-echarts';
+import { LinechartService } from '../../../shared/services/linechart/linechart.service';
+import { PiechartService } from '../../../shared/services/piechart/piechart.service';
+import { GeneralChartService } from '../../../shared/services/general-chart/general-chart.service';
+
 
 @Component({
   selector: 'app-transaction-board',
@@ -32,21 +39,39 @@ import { TextFormatPipe } from '../../../core/pipes/text-format.pipe';
     MatSortModule,
     MatProgressSpinnerModule,
 
-    TextFormatPipe
+    NgxEchartsModule,
+
+    TextFormatPipe,
   ],
   templateUrl: './transaction-board.component.html',
-  styleUrl: './transaction-board.component.scss'
+  styleUrl: './transaction-board.component.scss',
+  providers: [
+    DatePipe
+  ]
 })
 export class TransactionBoardComponent implements OnInit, AfterContentInit{
   txLoading = true
   private _socketService = inject(SocketService)
+  private _generalChartService = inject(GeneralChartService)
+  private _lineChartService = inject(LinechartService)
+  private _pieChartService = inject(PiechartService)
 
   transactions$ = this._socketService.getTransactions()
+
+  lineChartOption: any
+
+  pieChartOptions: any[] = []
+
+  private _tableViewSubject = new BehaviorSubject<boolean>(true)
+  tableView$ = this._tableViewSubject.asObservable()
+
 
   private _filterSubject = new BehaviorSubject<string>('')
   filter$ = this._filterSubject.asObservable()
 
   filteredTransactions$: Observable<TransactionRead[]> = of([])
+
+  isArray = Array.isArray
 
   ngOnInit(): void {
     this.filteredTransactions$ =  combineLatest([
@@ -64,8 +89,19 @@ export class TransactionBoardComponent implements OnInit, AfterContentInit{
   }
 
   ngAfterContentInit(): void {
-    //this.filteredTransactions$.subscribe(data => console.log(data))
+    this.transactions$.subscribe(data => {
+      //var distinctTransactionNames = this._generalChartService._retrieveTransactionNames(data)
 
+      this.lineChartOption = this._lineChartService._createLineChartForTransactions(data)
+
+      this.pieChartOptions = this._pieChartService._createPieChartsTransaction(data)
+    })
+
+  }
+
+  switchView() {
+    var view = this._tableViewSubject.value
+    this._tableViewSubject.next(!view)
   }
 
 

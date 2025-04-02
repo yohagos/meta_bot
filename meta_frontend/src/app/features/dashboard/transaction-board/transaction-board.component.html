@@ -1,16 +1,41 @@
-<div class="card-container" *ngIf="filteredTransactions$ | async as transactions">
-  <div class="card-grid">
-    <mat-card class="card {{getScssClass(tx.transaction_type)}}" *ngFor="let tx of transactions">
-      <div class="card-content" *ngIf="tx.coin">
-        <div class="left-section">
-          <h4> {{tx.coin.coin_name}} </h4>
+<button mat-flat-button (click)="switchView()">
+  Switch View
+</button>
+
+@if (tableView$ | async) {
+  <div class="card-container" *ngIf="filteredTransactions$ | async as transactions">
+    <div class="card-grid">
+      <mat-card class="card {{getScssClass(tx.transaction_type)}}" *ngFor="let tx of transactions">
+        <div class="card-content" *ngIf="tx.coin">
+          <div class="left-section">
+            <h3> {{tx.coin.coin_name}} </h3>
+          </div>
+          <div class="right-section">
+            <p>Amount:  {{tx.amount}} </p>
+            <p>Price:  {{tx.price | number}} $ </p>
+            <p> {{tx.transaction_type | textFormat}} </p>
+          </div>
         </div>
-        <div class="right-section">
-          <p>Amount:  {{tx.amount}} </p>
-          <p>Price:  {{tx.price | number}} $ </p>
-          <p> {{tx.transaction_type | textFormat}} </p>
-        </div>
-      </div>
-    </mat-card>
+      </mat-card>
+    </div>
   </div>
-</div>
+} @else {
+  @if (lineChartOption) {
+    <div echarts [options]="lineChartOption">
+
+    </div>
+  }
+
+  @if (pieChartOptions && isArray(pieChartOptions)) {
+    <div class="pie-container">
+      <div class="pies">
+        @for (item of pieChartOptions; track $index) {
+          <div echarts [options]="item" class="pie-charts">
+
+          </div>
+        }
+      </div>
+    </div>
+  }
+}
+
