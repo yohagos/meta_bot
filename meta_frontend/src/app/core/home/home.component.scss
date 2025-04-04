@@ -1,2 +1,129 @@
+@use 'sass:map';
+@use '../../../styles.scss';
+@use '../../../styles/theme-colors.scss' as theme;
+
+.card-container {
+  max-width: 90%;
+  min-height: 50em;
+  margin: 1em auto;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-gap: 1em;
+}
+
+.card {
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  height: auto;
+  margin: 1em;
+  min-height: 120px;
+
+  .card-content {
+    display: flex;
+    border-radius: 16px;
+
+    .left-section {
+      flex: 4;
+      margin: auto 1em;
+    }
+
+    .right-section {
+      flex: 3;
+      margin: auto 1em;
+      align-items: flex-end;
+    }
+  }
+}
+
+.card-sold {
+  margin: 0.4em;
+  color: map.get(theme.$primary, 80);
+  border-radius: 16px;
+
+  .mat-mdc-card-subtitle {
+    color: white;
+  }
+
+  &:hover {
+    box-shadow: 0 0 20px map.get(theme.$primary, 90);
+    transform: scale(1.04);
+
+    transition: box-shadow 1s ease-out, transform 1.3s ease-in-out;
+  }
+}
+
+.card-bought {
+  margin: 0.4em;
+  color: map.get(theme.$tertiary, 80);
+  border-radius: 16px;
+
+  .mat-mdc-card-subtitle {
+    color: white;
+  }
+
+  &:hover {
+    box-shadow: 0 0 20px map.get(theme.$tertiary, 80);
+    transform: scale(1.04);
+
+    transition: box-shadow 1s ease-out, transform 1.3s ease-in-out;
+  }
+}
+
+.pie-container {
+  max-width: 90%;
+  min-height: 80em;
+  margin: 0.4em auto;
+
+  .pies {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    grid-gap: 0.5em;
+
+    .pie-chart {
+      overflow: hidden;
+      height: auto;
+      min-width: 400px;
+      min-height: 300px;
+    }
+  }
+}
+
+.scroll-section {
+  min-height: 60em;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 2rem 0;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.scroll-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-section:nth-child(1) {transition-delay: 0.1s;}
+.scroll-section:nth-child(2) {transition-delay: 0.3s;}
 
 
+.titles {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 2em auto;
+
+  .title {
+    font-size: 45px;
+  }
+
+  .subtitle {
+    font-size: 22px;
+    margin: auto 4em;
+  }
+}

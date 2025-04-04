@@ -1,5 +1,64 @@
-<div class="container">
-  <h3>
-    HomePage
-  </h3>
-</div>
+<img src="/assets/images/logo-2.png" width="100%">
+
+<section
+  id="section1"
+  appViewportTrigger
+  class="scroll-section"
+  >
+  <div class="titles">
+    <h1 class="title">
+      Overview for Transactions
+    </h1>
+    <h3 class="subtitle">
+      Just a short representation how the recently processed transactions will be displayed...
+    </h3>
+  </div>
+  @if (shortTransaction$ | async) {
+    <div
+      class="card-container"
+
+      *ngIf="shortTransaction$ | async as transactions">
+      <div class="card-grid">
+        <mat-card class="card {{getScssClass(tx.transaction_type)}}" *ngFor="let tx of transactions">
+          <div class="card-content" *ngIf="tx.coin">
+            <div class="left-section">
+              <h3> {{tx.coin.coin_name}} </h3>
+            </div>
+            <div class="right-section">
+              <p>Amount:  {{tx.amount}} </p>
+              <p>Price:  {{tx.price | number}} $ </p>
+              <p> {{tx.transaction_type | textFormat}} </p>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  }
+</section>
+
+<section
+  id="section2"
+  appViewportTrigger
+  class="scroll-section"
+  >
+  <div class="titles">
+    <h1 class="title">
+      Widgets for the Dashboard
+    </h1>
+    <h3 class="subtitle">
+      A minor example how the metrics will be displaying all transactions
+    </h3>
+  </div>
+  @if (chartOptions && isArray(chartOptions)) {
+    <div class="pie-container">
+      <div class="pies">
+        @for (item of chartOptions; track $index) {
+          <div echarts [options]="item" class="pie-charts" [theme]="chartTheme">
+
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>
+
