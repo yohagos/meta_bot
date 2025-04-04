@@ -14,6 +14,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TextFormatPipe } from '../../../core/pipes/text-format.pipe';
+import { ColumnChartService } from '../../../shared/services/columnChart/column-chart.service';
+import { BehaviorSubject } from 'rxjs';
+import { NgxEchartsModule } from 'ngx-echarts';
 
 @Component({
   selector: 'app-stats-board',
@@ -31,6 +34,8 @@ import { TextFormatPipe } from '../../../core/pipes/text-format.pipe';
     MatSortModule,
     MatProgressSpinnerModule,
 
+    NgxEchartsModule,
+
     TextFormatPipe,
   ],
   templateUrl: './stats-board.component.html',
@@ -42,6 +47,7 @@ export class StatsBoardComponent implements AfterContentChecked {
   private _categoryService = inject(CategoryService)
   private _socketService = inject(SocketService)
   private _interestedCoinService = inject(InterestService)
+  private _columnChartService = inject(ColumnChartService)
 
   categories$ = this._categoryService.getCategories()
   categorySelected: string = ''
@@ -56,11 +62,19 @@ export class StatsBoardComponent implements AfterContentChecked {
 
   expandedElementId!: string | null
 
+  statsBarChart: any
+
+  private _switchView = new BehaviorSubject<boolean>(true)
+  switchView$ = this._switchView.asObservable()
 
   constructor() {}
 
   ngAfterContentChecked(): void {
-    this._socketService.stats$.subscribe(data => this.handleStatsData(data))
+    this._socketService.stats$.subscribe((data) => {
+      this.handleStatsData(data)
+
+      this.statsBarChart = this._columnChartService.createColumnChartWithGradient(data)
+    })
   }
 
   applyStatsFilter(event: Event) {
@@ -122,21 +136,9 @@ export class StatsBoardComponent implements AfterContentChecked {
       .sort((a: Stats, b: Stats) => Number(a.rank)  - Number(b.rank))
   }
 
-  /* private highlightChanges(changes: { newEntries: Stats[], updatedEntries: Stats[] }) {
-    changes.newEntries.forEach(stat =>
-      this.animateElement(stat.data_id, 'new-entry'));
-
-    changes.updatedEntries.forEach(stat =>
-      this.animateElement(stat.data_id, 'rank-changed'));
-  } */
-
-  private animateElement(coinId: string, animationClass: string) {
-    const element = document.getElementById(coinId);
-    if (element) {
-      element.classList.add(animationClass);
-      setTimeout(() =>
-        element.classList.remove(animationClass), 1000);
-    }
+  switchView() {
+    var view = this._switchView.value
+    this._switchView.next(!view)
   }
 
   addToInterested(element: Stats) {

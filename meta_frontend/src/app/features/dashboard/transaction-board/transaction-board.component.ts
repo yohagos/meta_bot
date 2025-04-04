@@ -52,7 +52,6 @@ import { GeneralChartService } from '../../../shared/services/general-chart/gene
 export class TransactionBoardComponent implements OnInit, AfterContentInit{
   txLoading = true
   private _socketService = inject(SocketService)
-  private _generalChartService = inject(GeneralChartService)
   private _lineChartService = inject(LinechartService)
   private _pieChartService = inject(PiechartService)
 
@@ -90,8 +89,6 @@ export class TransactionBoardComponent implements OnInit, AfterContentInit{
 
   ngAfterContentInit(): void {
     this.transactions$.subscribe(data => {
-      //var distinctTransactionNames = this._generalChartService._retrieveTransactionNames(data)
-
       this.lineChartOption = this._lineChartService._createLineChartForTransactions(data)
 
       this.pieChartOptions = this._pieChartService._createPieChartsTransaction(data)

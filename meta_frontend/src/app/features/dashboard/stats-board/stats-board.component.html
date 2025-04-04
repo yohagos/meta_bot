@@ -1,6 +1,8 @@
-@if (statsLoading) {
-  <mat-spinner class="spinner"></mat-spinner>
-} @else {
+<button mat-flat-button (click)="switchView()" class="switch-button">
+  Switch View
+</button>
+
+@if (switchView$ | async) {
   <div class="filters">
     <mat-form-field>
       <mat-label>Filter</mat-label>
@@ -141,5 +143,8 @@
       </td>
     </tr>
   </table>
+} @else {
+  <div echarts [options]="statsBarChart">
 
+  </div>
 }
