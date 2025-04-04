@@ -7,7 +7,7 @@
 
 
 html {
-  height: 100% ;
+  height: 95% ;
   padding: 0;
 }
 
@@ -35,10 +35,6 @@ body {
     color: map.get(tc.$primary, 70),
   ));
 
-  @include mat.list-overrides((
-    //list-item-hover-label-text-color: map.get(tc.$primary, 60),
-  ));
-
   @include mat.snack-bar-overrides((
     container-color: var(--surface-container-low),
   ));
@@ -49,8 +45,8 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-corner {
@@ -92,5 +88,14 @@ body {
 
 ::-ms-input-placeholder {
   color: rgba(255, 255, 255, 0.7);
+}
+
+.switch-button {
+  margin: 1.5em;
+  padding-bottom: 1em;
+}
+
+::ng-deep .mat-mdc-form-field-subscript-wrapper {
+  display: none;
 }
 
