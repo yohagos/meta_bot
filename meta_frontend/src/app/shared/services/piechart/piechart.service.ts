@@ -15,6 +15,7 @@ export class PiechartService {
     this.pieChartOptions = []
     for (let tx of multiTransactions) {
       var option = {
+        backgroundColor: 'transparent',
         tooltip: {
           trigger: 'item'
         },
@@ -33,7 +34,8 @@ export class PiechartService {
             endAngle: 360,
             data: this._generateDataPieChart(tx)
           }
-        ]
+        ],
+        darkMode: 'auto'
       }
       this.pieChartOptions.push(option)
     }
@@ -43,7 +45,9 @@ export class PiechartService {
 
   _generateDataPieChart(transactions: TransactionRead[]) {
       var sold = 0
+      var soldAmount = 0
       var bought = 0
+      var boughtAmount = 0
       var coin = ''
       transactions.forEach((element, index) => {
         if (index === 0) {
@@ -51,13 +55,17 @@ export class PiechartService {
         }
         if (element.transaction_type === TransactionTypeEnumMap.SOLD) {
           sold += element.price
-        } else {
+          soldAmount += element.amount
+        } else  {
           bought += element.price
+          boughtAmount += element.amount
         }
       })
       return [
         { value: sold.toFixed(3), name: `${coin} Sold` },
-        { value: bought.toFixed(3), name: `${coin} Bought` }
+        { value: soldAmount.toFixed(3), name: `${coin} Amount Sold` },
+        { value: bought.toFixed(3), name: `${coin} Bought` },
+        { value: boughtAmount.toFixed(3), name: `${coin} Amount Bought` }
       ]
   }
 

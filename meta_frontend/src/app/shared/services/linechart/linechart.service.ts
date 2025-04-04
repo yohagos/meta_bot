@@ -10,6 +10,7 @@ export class LinechartService {
 
   _createLineChartForTransactions(transactions: TransactionRead[]) {
         var option = {
+          backgroundColor: 'transparent',
           title: {
             text: 'Transactions'
           },
