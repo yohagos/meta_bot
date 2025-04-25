@@ -18,7 +18,6 @@ export class InterestService {
   private _interestSubject = new BehaviorSubject<CoinInterestRead[]>([])
   interest$ = this._interestSubject.asObservable()
 
-
   addStatsCoin(
     stat: Stats
   ) {
@@ -52,7 +51,6 @@ export class InterestService {
     }).subscribe({
       next: (data) => {
         this._interestSubject.next(data)
-        console.log(data)
       },
       error: (err: Error) => {
         this._snackbarService.openSnackBar(`Could not load favorites`, 'error')
@@ -81,7 +79,6 @@ export class InterestService {
   }
 
   removeInterestById(element: Stats) {
-    console.log(element)
     const data: CoinInterestRead | undefined = this._interestSubject.value.find(item =>
     {
       if (
@@ -96,7 +93,7 @@ export class InterestService {
     if (data) {
       this._interestApi.deleteApiV1InterestDeleteCoinIdDelete({
         coin_id: data.id
-      }).subscribe(res => console.log("delete response : ", res))
+      }).subscribe()
     }
     this._loadInterests()
   }

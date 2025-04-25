@@ -1,6 +1,4 @@
-import { AfterViewInit, Component, inject, OnDestroy, ViewChild } from '@angular/core';
-import { SocketService } from './services/socket.service';
-import { Stats, TransactionRead } from '../../services/models';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -8,14 +6,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from "@angular/material/input";
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
 import { TextFormatPipe } from '../../core/pipes/text-format.pipe';
-import { InterestService } from '../interests/services/interest.service';
 import { CategoryService } from './services/category.service';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { map, of } from 'rxjs';
 import { Router, RouterModule } from '@angular/router';
 
 type Navigation = {

@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { AfterContentChecked, AfterContentInit, Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterContentInit, Component, inject, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,11 +15,9 @@ import { TransactionRead } from '../../../services/models';
 import { MatCardModule } from '@angular/material/card';
 import { TextFormatPipe } from '../../../core/pipes/text-format.pipe';
 import * as ECharts from "echarts";
-import { TransactionData } from '../example.data';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { LinechartService } from '../../../shared/services/linechart/linechart.service';
 import { PiechartService } from '../../../shared/services/piechart/piechart.service';
-import { GeneralChartService } from '../../../shared/services/general-chart/general-chart.service';
 
 
 @Component({

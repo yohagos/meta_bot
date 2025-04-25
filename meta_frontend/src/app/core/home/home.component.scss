@@ -4,7 +4,7 @@
 
 .card-container {
   max-width: 90%;
-  min-height: 50em;
+  min-height: 45em;
   margin: 1em auto;
 }
 
@@ -75,7 +75,7 @@
 
 .pie-container {
   max-width: 90%;
-  min-height: 80em;
+  min-height: 45em;
   margin: 0.4em auto;
 
   .pies {
@@ -90,6 +90,16 @@
       min-height: 300px;
     }
   }
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  margin: auto;
+   img {
+    min-width: 50em;
+    min-height: 35em;
+   }
 }
 
 .scroll-section {

@@ -48,7 +48,6 @@ export class InterestDetailComponent {
         if (interestId) {
           this._interestService.getInterestById(interestId).subscribe({
             next: (data) => {
-              console.log(data)
               this.interest$.next(data)
               this.loading = false
             },

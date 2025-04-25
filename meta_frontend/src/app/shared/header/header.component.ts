@@ -114,8 +114,9 @@ export class HeaderComponent {
     })
   }
 
-  login() {
-    this._keycloak.login()
+  async login() {
+    await document.requestStorageAccess()
+    await this._keycloak.login()
   }
 
   logout() {

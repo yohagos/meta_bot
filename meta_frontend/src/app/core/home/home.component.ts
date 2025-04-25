@@ -41,7 +41,7 @@ export class HomeComponent implements OnDestroy {
   private _subscription: Subscription = interval(12000).subscribe(() => {
     var data = this._examplesService.generateData()
 
-    const subTransactions = data.slice(0, 5)
+    const subTransactions = data.slice(0, 9)
     this._shortTransactionsSubject.next(subTransactions)
 
     this.chartOptions = this._pieChartService._createPieChartsTransaction(data)
