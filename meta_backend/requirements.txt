@@ -9,7 +9,7 @@ python-multipart
 jose
 pyjwt
 sqlmodel
-psycopg2
+psycopg2-binary
 alembic[all]
 aio_pika
 aiohttp[all]

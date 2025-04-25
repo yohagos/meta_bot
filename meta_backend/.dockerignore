@@ -1,0 +1,7 @@
+**/__pycache__
+**/.venv
+**/migrations
+**/.env.example
+
+**/alembic.ini
+**/Dockerfile
