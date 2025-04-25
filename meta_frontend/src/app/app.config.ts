@@ -1,7 +1,6 @@
 import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { CommonModule, DATE_PIPE_DEFAULT_OPTIONS } from '@angular/common';

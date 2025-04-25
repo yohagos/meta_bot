@@ -9,14 +9,20 @@ import {
 } from "keycloak-angular";
 import { KeycloakConfig } from "keycloak-js";
 
+/* const keycloakConfig: KeycloakConfig = {
+  url: 'https://meta-kc:9090',
+  realm: 'meta',
+  clientId: 'meta-ui'
+} */
+
 const keycloakConfig: KeycloakConfig = {
-  url: 'http://localhost:9090',
+  url: window.location.origin + '/auth',
   realm: 'meta',
   clientId: 'meta-ui'
 }
 
 const localhostCondition = createInterceptorCondition<IncludeBearerTokenCondition>({
-  urlPattern: /^(http:\/\/localhost:8000)(\/.*)?$/i
+  urlPattern: /^(http:\/\/meta_api:8000)(\/.*)?$/i
 });
 
 export const provideKeycloakAngular = () =>
