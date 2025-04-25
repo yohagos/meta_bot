@@ -72,7 +72,9 @@ async def _find_coin(coin_id: UUID, session: AsyncSession) -> CoinRead:
 
 async def _find_user(user_id: UUID) -> User:
     user = kc_service.get_user_info(user_id)
-    return User.model_validate(user)
+    if user:
+        return User.model_validate(user)
+    return
 
         
 async def transactions_task(

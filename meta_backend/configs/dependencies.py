@@ -1,5 +1,5 @@
-import logging
-from fastapi import Depends
+import os
+from fastapi import Depends, requests
 from keycloak import KeycloakAdmin
 from uuid import UUID
 
@@ -31,7 +31,7 @@ def get_keycloak_admin() -> KeycloakAdmin:
         realm_name=settings.KEYCLOAK_REALM,
         client_id=settings.KEYCLOAK_CLIENT_ID,
         client_secret_key=settings.KEYCLOAK_CLIENT_SECRET,
-        verify=False
+        verify=settings.KEYCLOAK_CA_CERTS
     )
 
 def get_keycloak_service(kc_admin: KeycloakAdmin = Depends(get_keycloak_admin)) -> KeycloakUserService:

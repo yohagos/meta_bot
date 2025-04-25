@@ -48,11 +48,26 @@ async def clear_stats_data(session: AsyncSession):
         await session.exec(delete(Stats))
         await session.commit()
 
+async def publish_last_message(mq_manager: RabbitMQConnectionManager, config: RabbitMQConfig):
+    async with AsyncSessionLocal() as session:
+        last_data: List[Stats] = await session.exec(select(Stats))
+        payload = json.dumps(
+            [item.model_dump() for item in last_data],
+            default=str
+        ).encode()
+        await publish_message(
+            mq_manager,
+            config,
+            payload
+        )
+
+
 
 async def coin_api_polling_task(app: FastAPI, stop_event: asyncio.Event):
     async with AsyncSessionLocal() as session:
         config = await load_exchange_info(session)
         last_data: List[Stats] = await session.exec(select(Stats))
+        
 
     mq_manager = app.state.mq_manager
 
@@ -75,6 +90,7 @@ async def coin_api_polling_task(app: FastAPI, stop_event: asyncio.Event):
             async with AsyncSessionLocal() as session:
                 data = await fetch_coin_data()
                 if not data or "data" not in data:
+                    await publish_last_message(mq_manager, config)
                     await asyncio.sleep(20)
                     continue
 

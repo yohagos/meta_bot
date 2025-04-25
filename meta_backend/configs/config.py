@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     KEYCLOAK_REALM: str = os.getenv('KEYCLOAK_REALM')
     KEYCLOAK_CLIENT_ID: str = os.getenv('KEYCLOAK_CLIENT_ID')
     KEYCLOAK_CLIENT_SECRET: str = os.getenv('KEYCLOAK_CLIENT_SECRET')
+    KEYCLOAK_CA_CERTS: str = os.getenv("KEYCLOAK_CA_CERTS")
     CALLBACK_URI: str = os.getenv('CALLBACK_URI')
 
     AUTHORIZATION_URL: str = os.getenv('AUTHORIZATION_URL')

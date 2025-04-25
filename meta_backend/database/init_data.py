@@ -241,10 +241,6 @@ async def create_test_data(session: AsyncSession):
         coins = [coin for coin in COIN_INTEREST_TEST_DATA]
         session.add_all(coins)
 
-    """ if existing_histories.first() is None:
-        coins = [coin for coin in COIN_HISTORY_TEST_DATA]
-        session.add_all(coins) """
-
     if existing_mq_configs.first() is None:
         confs = [conf for conf in RABBITMQ_CONFIGS]
         session.add_all(confs)
@@ -290,6 +286,7 @@ async def lifespan(app: FastAPI):
         tasks.append(asyncio.create_task(transactions_task(app, stop_event)))
         tasks.append(asyncio.create_task(aggregator(app, shared_queue, stop_event)))
         yield
+        logger.info('All tasks started succesfully')
     
     finally:
         stop_event.set()
@@ -309,5 +306,7 @@ async def lifespan(app: FastAPI):
         del app.state.mq_manager
         del app.state.ws_manager
         del app.state.shared_queue
+        logger.info('All tasks ended')
+        
 
     

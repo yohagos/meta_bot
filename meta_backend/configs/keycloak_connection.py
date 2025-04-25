@@ -34,7 +34,8 @@ _keycloak_openid = KeycloakOpenID(
     server_url=settings.KEYCLOAK_URL,
     realm_name=settings.KEYCLOAK_REALM,
     client_id=settings.KEYCLOAK_CLIENT_ID,
-    client_secret_key=settings.KEYCLOAK_CLIENT_SECRET
+    client_secret_key=settings.KEYCLOAK_CLIENT_SECRET,
+    verify=False
 )
 
 
@@ -81,9 +82,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     try:
         decoded_token = _keycloak_openid.decode_token(
             token,
-            _keycloak_openid.certs()
+            key=_keycloak_openid.certs(),
+            options={"verify_signature": False, "verify_aud": False}
         )
-
         roles = decoded_token.get("realm_access", {}).get("roles", [])
         decoded_token["roles"] = roles
         return decoded_token
