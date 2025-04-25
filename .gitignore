@@ -180,6 +180,8 @@ meta_frontend/openapi
 meta_frontend/certs
 meta_frontend/.angular
 
+meta_keycloak
+
 pg_data
 kc_data
 mq_data

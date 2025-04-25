@@ -12,20 +12,22 @@ services:
       POSTGRES_USER: pgadmin
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      interval: 3s
+      timeout: 3s
+      retries: 3
     volumes:
       - ./pg_data:/var/lib/postgresql/data
 
   keycloak:
-    image: quay.io/keycloak/keycloak
+    image: quay.io/keycloak/keycloak:latest
     container_name: 'meta_kc'
-    command: start-dev --verbose
+    user: "1000:0"
     ports:
-      - '9090:8080'
+      - '9090:8443'
     networks:
-      - meta-network
+      meta-network:
+        aliases:
+          - meta-kc
     restart: unless-stopped
     depends_on:
       postgres:
@@ -34,20 +36,24 @@ services:
       KEYCLOAK_ADMIN: kcadmin
       KEYCLOAK_ADMIN_PASSWORD: kcadmin
       KC_DB: postgres
-      KC_SCHEMA: public
       KC_DB_URL: jdbc:postgresql://meta_db:5432/meta
       KC_DB_USERNAME: pgadmin
       KC_DB_PASSWORD: pgadmin
-      KC_HOSTNAME: localhost
+      KC_HTTP_ENABLED: 'false'
+      KC_HOSTNAME: meta-kc
+      KC_HOSTNAME_STRICT: 'false'
+      KC_HTTPS_PORT: 8443
       KC_FEATURES: token-exchange,admin-fine-grained-authz
+      KC_PROXY: edge
+      KC_HTTPS_CERTIFICATE_FILE: /opt/keycloak/conf/server.crt
+      KC_HTTPS_CERTIFICATE_KEY_FILE: /opt/keycloak/conf/server.key
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9090/health/ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      test: ["CMD", "curl", "-f", "https://meta-kc:8443/health/ready"]
     volumes:
       - ./kc_data:/opt/keycloak/data/
+      - ./meta_frontend/certs/server.crt:/opt/keycloak/conf/server.crt
+      - ./meta_frontend/certs/server.key:/opt/keycloak/conf/server.key
+    entrypoint: /opt/keycloak/bin/kc.sh start --verbose --https-port=8443
 
   rabbitmq:
     image: 'rabbitmq:3.9-management'
@@ -74,6 +80,44 @@ services:
       - ./meta_rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
       - ./meta_rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - ./mq_data:/var/lib/rabbitmq
+
+  api:
+    build: 
+      context: ./meta_backend
+      dockerfile: Dockerfile
+    container_name: 'meta_api'
+    networks:
+      - meta-network
+    ports:
+      - '8000:8000'
+    restart: on-failure
+    healthcheck:
+      test: curl --fail http://localhost:8000/docs || exit 1
+    environment:
+      - REQUESTS_CA_BUNDLE=/meta_backend/certs/server.crt
+    volumes:
+      - ./meta_frontend/certs/server.crt:/meta_backend/certs/server.crt:ro
+    depends_on:
+      - rabbitmq
+      - keycloak
+
+  ui:
+    build: 
+      context: ./meta_frontend
+      dockerfile: Dockerfile
+    container_name: 'meta_ui'
+    networks:
+      meta-network:
+        aliases:
+          - meta-ui
+    ports:
+      - '4200:443'
+    environment:
+      VIRTUAL_HOST: localhost
+      VIRTUAL_PORT: 443
+    depends_on:
+      - rabbitmq
+      - keycloak
 
 networks:
   meta-network:
